@@ -14,22 +14,36 @@ url = driver.command_executor._url
 
 driver.get("https://www.indeed.com/jobs?q=junior+developer&l=Remote&explvl=entry_level")
 
+def my_function():
+    titles = driver.find_elements_by_class_name('title')
+    jobs = []
 
-titles = driver.find_elements_by_class_name('title')
-jobs = []
 
-for title in titles:
-    job = title.find_element_by_tag_name('a')
-    if 'junior' and 'developer' in job.text.lower():   
-        jobs.append({'title': job.text, 'link': job.get_attribute('href')})
-# print(jobs)
-email_string = ''
+    for title in titles:
+        job = title.find_element_by_tag_name('a')
+        if 'junior' and 'developer' in job.text.lower():   
+            jobs.append({'title': job.text, 'link': job.get_attribute('href')})
+    # print(jobs)
+    global email_string
+    email_string = ''
 
-for job in jobs:
-    email_string += '\n' + '\n' + job['title'] + ' ' + job['link'] 
+    for job in jobs:
+        email_string += '\n' + '\n' + job['title'] + ' ' + job['link'] 
+    return email_string
 
-print(email_string)
-email.set_content(email_string)
+my_function()
+
+final_email_string = email_string
+print(len(final_email_string))
+driver.find_element_by_xpath("//*[@id='resultsCol']/nav/div/ul/li[3]/a").click()
+
+my_function()
+
+final_email_string += email_string
+print(len(final_email_string))
+
+
+email.set_content(final_email_string)
 
 with smtplib.SMTP(host='smtp.gmail.com', port=587) as smtp:
     # start server
